@@ -23,3 +23,30 @@ To develop and submit your solution please follow these steps:
 1. Create a public repo in your own GitHub account and push the technical test there
 2. Develop your solution and push your changes to your own public GitHub repo
 3. Once you're happy with your solution send us a link to your repo
+
+#In order to setup the Azure infrastructure these commands will need to be executed:
+az login
+az group create --name VatRegistrationRG --location eastus
+az acr create --resource-group VatRegistrationRG --name VatRegACR --sku Basic
+az acr create --resource-group VatRegistrationRG --name VatRegACR --sku Basic
+
+az appservice plan create --name VatRegPlan --resource-group VatRegistrationRG --is-linux --sku B1
+az webapp create --resource-group VatRegistrationRG --plan VatRegPlan --name VatRegistrationAPI --deployment-container-image-name VatRegACR.azurecr.io/vatregistrationapi:v1
+az webapp config appsettings set --resource-group VatRegistrationRG --name VatRegistrationAPI --settings \
+"ASPNETCORE_ENVIRONMENT=Production" \
+"ApplicationInsights__InstrumentationKey=<Your-AppInsights-Key>" \
+"ConnectionStrings__DefaultConnection=<Your-Azure-SQL-Connection-String>"
+
+az webapp browse --resource-group VatRegistrationRG --name VatRegistrationAPI
+
+#To set up the Azure Key Vault:
+az keyvault create --name VatRegKeyVault --resource-group VatRegistrationRG --location eastus
+az keyvault secret set --vault-name VatRegKeyVault --name "SqlServerPassword" --value "YourStrongPassword123!"
+az webapp identity assign --name VatRegistrationAPI --resource-group VatRegistrationRG
+
+# Get the managed identity's client ID
+az webapp show --name VatRegistrationAPI --resource-group VatRegistrationRG --query identity.principalId --output tsv
+
+# Grant Key Vault access to the Web App's managed identity
+az keyvault set-policy --name VatRegKeyVault --object-id <PRINCIPAL_ID> --secret-permissions get list
+

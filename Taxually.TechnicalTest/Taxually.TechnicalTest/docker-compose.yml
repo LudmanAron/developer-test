@@ -1,0 +1,24 @@
+version: '3.8'
+
+services:
+  vatregistration-api:
+    build:
+      context: .
+      dockerfile: VatRegistration.API/Dockerfile
+    ports:
+      - "8080:80"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+      - KeyVaultName=VatRegKeyVault
+      - ApplicationInsights__InstrumentationKey=${APPINSIGHTS_INSTRUMENTATIONKEY}
+    depends_on:
+      - sqlserver
+
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: sqlserver
+    environment:
+      SA_PASSWORD: "UseKeyVaultSecret"  # Placeholder; actual password comes from Key Vault
+      ACCEPT_EULA: "Y"
+    ports:
+      - "1433:1433"
