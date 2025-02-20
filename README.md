@@ -24,7 +24,7 @@ To develop and submit your solution please follow these steps:
 2. Develop your solution and push your changes to your own public GitHub repo
 3. Once you're happy with your solution send us a link to your repo
 
-#In order to setup the Azure infrastructure these commands will need to be executed:
+# In order to setup the Azure infrastructure these commands will need to be executed:
 az login
 az group create --name VatRegistrationRG --location eastus
 az acr create --resource-group VatRegistrationRG --name VatRegACR --sku Basic
@@ -39,7 +39,7 @@ az webapp config appsettings set --resource-group VatRegistrationRG --name VatRe
 
 az webapp browse --resource-group VatRegistrationRG --name VatRegistrationAPI
 
-#To set up the Azure Key Vault:
+# To set up the Azure Key Vault:
 az keyvault create --name VatRegKeyVault --resource-group VatRegistrationRG --location eastus
 az keyvault secret set --vault-name VatRegKeyVault --name "SqlServerPassword" --value "YourStrongPassword123!"
 az webapp identity assign --name VatRegistrationAPI --resource-group VatRegistrationRG
