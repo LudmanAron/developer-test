@@ -1,5 +1,6 @@
 ﻿using Taxually.TechnicalTest.Core.Interfaces;
 using Taxually.TechnicalTest.Core.Models;
+using Taxually.TechnicalTest.Core.Clients;
 
 namespace Taxually.TechnicalTest.Infrastructure.Strategies
 {
@@ -8,10 +9,16 @@ namespace Taxually.TechnicalTest.Infrastructure.Strategies
     /// </summary>
     public class UkVatRegistrationStrategy : IVatRegistrationStrategy
     {
+        private readonly ITaxuallyHttpClient _httpClient;
+
+        public UkVatRegistrationStrategy(ITaxuallyHttpClient httpClient)
+        {
+            _httpClient = httpClient;
+        }
+
         public async Task RegisterVatAsync(VatRegistrationRequest request)
         {
-            var httpClient = new TaxuallyHttpClient();
-            await httpClient.PostAsync("https://api.uktax.gov.uk", request);
+            await _httpClient.PostAsync("https://api.uktax.gov.uk", request);
         }
     }
 }

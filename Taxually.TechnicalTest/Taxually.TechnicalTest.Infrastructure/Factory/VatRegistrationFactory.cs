@@ -8,17 +8,25 @@ namespace Taxually.TechnicalTest.Infrastructure.Factory
     /// <summary>
     /// Factory to get the correct Strategy
     /// </summary>
-    public class VatRegistrationFactory
+    public class VatRegistrationFactory : IVatRegistrationFactory
     {
         private readonly Dictionary<CountryCode, IVatRegistrationStrategy> _strategies;
+        private readonly ITaxuallyQueueClient _queueClient;
+        private readonly ITaxuallyHttpClient _httpClient;
+
+        public VatRegistrationFactory(ITaxuallyQueueClient queueClient, ITaxuallyHttpClient httpClient)
+        {
+            _queueClient = queueClient;
+            _httpClient = httpClient;
+        }
 
         public VatRegistrationFactory()
         {
             _strategies = new Dictionary<CountryCode, IVatRegistrationStrategy>
             {
-            { CountryCode.GB, new UkVatRegistrationStrategy() },
-            { CountryCode.FR, new UkVatRegistrationStrategy() },
-            { CountryCode.DE, new GermanyVatRegistrationStrategy() }
+            { CountryCode.GB, new UkVatRegistrationStrategy(_httpClient) },
+            { CountryCode.FR, new FranceVatRegistrationStrategy(_queueClient) },
+            { CountryCode.DE, new GermanyVatRegistrationStrategy(_queueClient) }
         };
         }
 
@@ -32,5 +40,4 @@ namespace Taxually.TechnicalTest.Infrastructure.Factory
             throw new UnsupportedCountryException(country);
         }
     }
-
 }

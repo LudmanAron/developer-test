@@ -1,13 +1,13 @@
-﻿using Taxually.TechnicalTest.Core.Models;
-using Taxually.TechnicalTest.Infrastructure.Factory;
+﻿using Taxually.TechnicalTest.Core.Interfaces;
+using Taxually.TechnicalTest.Core.Models;
 
 namespace Taxually.TechnicalTest.Infrastructure.Services
 {
-    public class VatRegistrationService
+    public class VatRegistrationService : IVatRegistrationService
     {
-        private readonly VatRegistrationFactory _factory;
+        private readonly IVatRegistrationFactory _factory;
 
-        public VatRegistrationService(VatRegistrationFactory factory)
+        public VatRegistrationService(IVatRegistrationFactory factory)
         {
             _factory = factory;
         }

@@ -1,7 +1,13 @@
 using AspNetCoreRateLimit;
 using Azure.Identity;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+
+using Polly;
+
+using Taxually.TechnicalTest.API.Extensions;
 using Taxually.TechnicalTest.API.Middlewares;
+using Taxually.TechnicalTest.Core.Clients;
+using Taxually.TechnicalTest.Core.Interfaces;
 
 public class Program
 {
@@ -13,6 +19,13 @@ public class Program
         var keyVaultName = builder.Configuration["KeyVaultName"];
         var kvUri = $"https://{keyVaultName}.vault.azure.net/";
         builder.Configuration.AddAzureKeyVault(new Uri(kvUri), new DefaultAzureCredential());
+
+        builder.Services.AddClients();
+        builder.Services.AddFactories();
+        builder.Services.AddServices();
+
+        // Register response compression services
+        builder.Services.AddResponseCompression();
 
         // Add services to the container
         builder.Services.AddControllers();
@@ -42,6 +55,7 @@ public class Program
         });
 
         // Add Rate Limiting (optional)
+        builder.Services.AddMemoryCache();
         builder.Services.AddInMemoryRateLimiting();
         builder.Services.AddSingleton<IRateLimitConfiguration, RateLimitConfiguration>();
 
