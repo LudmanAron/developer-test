@@ -1,17 +1,23 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Azure.Core;
+
+using Microsoft.AspNetCore.Mvc;
+
 using Taxually.TechnicalTest.Core.Exceptions;
 using Taxually.TechnicalTest.Core.Models;
 using Taxually.TechnicalTest.Infrastructure.Services;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
-namespace Taxually.TechnicalTest.Controllers
+namespace Taxually.TechnicalTest.API.Controllers
 {
     /// <summary>
     /// Registers a company for a VAT number in a given country
     /// </summary>
     [ApiController]
     [Route("api/vat")]
+    [ProducesResponseType(typeof(ApiResponse), 200)]
+    [ProducesResponseType(typeof(ApiResponse), 400)]
+    [ProducesResponseType(typeof(ApiResponse), 500)] 
     public class VatRegistrationController : ControllerBase
     {
         private readonly VatRegistrationService _service;

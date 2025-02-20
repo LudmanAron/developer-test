@@ -10,8 +10,4 @@
     <ProjectReference Include="..\Taxually.TechnicalTest.Core\Taxually.TechnicalTest.Core.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Services\" />
-  </ItemGroup>
-
 </Project>

@@ -1,5 +1,5 @@
-﻿using Taxually.TechnicalTest.Core.Factory;
-using Taxually.TechnicalTest.Core.Models;
+﻿using Taxually.TechnicalTest.Core.Models;
+using Taxually.TechnicalTest.Infrastructure.Factory;
 
 namespace Taxually.TechnicalTest.Infrastructure.Services
 {

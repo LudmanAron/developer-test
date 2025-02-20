@@ -3,7 +3,7 @@ using Taxually.TechnicalTest.Core.Interfaces;
 using Taxually.TechnicalTest.Core.Models;
 using Taxually.TechnicalTest.Infrastructure.Strategies;
 
-namespace Taxually.TechnicalTest.Core.Factory
+namespace Taxually.TechnicalTest.Infrastructure.Factory
 {
     /// <summary>
     /// Factory to get the correct Strategy
