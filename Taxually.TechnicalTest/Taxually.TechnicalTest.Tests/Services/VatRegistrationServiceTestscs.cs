@@ -2,7 +2,6 @@
 using Moq;
 using Taxually.TechnicalTest.Infrastructure.Services;
 using Taxually.TechnicalTest.Core.Models;
-using System.Xml.Serialization;
 using Taxually.TechnicalTest.Core.Interfaces;
 using Taxually.TechnicalTest.Core.Exceptions;
 
@@ -12,17 +11,11 @@ namespace Taxually.TechnicalTest.Tests.Unit.Services
     public class VatRegistrationServiceTests
     {
         private readonly Mock<IVatRegistrationFactory> _mockFactory;
-        private readonly Mock<ITaxuallyQueueClient> _mockQueueClient;
-        private readonly Mock<ITaxuallyHttpClient> _mockHttpClient;
         private readonly VatRegistrationService _service;
 
         public VatRegistrationServiceTests()
         {
             _mockFactory = new Mock<IVatRegistrationFactory>();
-            _mockQueueClient = new Mock<ITaxuallyQueueClient>();
-            _mockHttpClient = new Mock<ITaxuallyHttpClient>();
-
-            // Setting up the service with mock dependencies
             _service = new VatRegistrationService(_mockFactory.Object);
         }
 
@@ -46,7 +39,6 @@ namespace Taxually.TechnicalTest.Tests.Unit.Services
 
             // Assert
             franceStrategyMock.Verify(x => x.RegisterVatAsync(It.Is<VatRegistrationRequest>(r => r.Country == CountryCode.FR)), Times.Once);
-            _mockQueueClient.Verify(q => q.EnqueueAsync("vat-registration-csv", It.IsAny<byte[]>()), Times.Once);
         }
 
         [Fact]
@@ -69,13 +61,6 @@ namespace Taxually.TechnicalTest.Tests.Unit.Services
 
             // Assert
             germanyStrategyMock.Verify(x => x.RegisterVatAsync(It.Is<VatRegistrationRequest>(r => r.Country == CountryCode.DE)), Times.Once);
-
-            // Verify that XML was generated for Germany strategy
-            var stringWriter = new StringWriter();
-            var serializer = new XmlSerializer(typeof(VatRegistrationRequest));
-            serializer.Serialize(stringWriter, request);
-            var xml = stringWriter.ToString();
-            _mockQueueClient.Verify(q => q.EnqueueAsync("vat-registration-xml", It.Is<string>(s => s == xml)), Times.Once);
         }
 
         [Fact]
@@ -98,12 +83,10 @@ namespace Taxually.TechnicalTest.Tests.Unit.Services
 
             // Assert
             ukStrategyMock.Verify(x => x.RegisterVatAsync(It.Is<VatRegistrationRequest>(r => r.Country == CountryCode.GB)), Times.Once);
-
-            _mockHttpClient.Verify(http => http.PostAsync("https://api.uktax.gov.uk", It.IsAny<VatRegistrationRequest>()), Times.Once);
         }
 
         [Fact]
-        public async Task RegisterVatAsync_ShouldThrowException_WhenStrategyIsNull()
+        public async Task RegisterVatAsync_ShouldThrowException_WhenStrategyIsNotFound()
         {
             // Arrange
             var request = new VatRegistrationRequest
@@ -113,12 +96,11 @@ namespace Taxually.TechnicalTest.Tests.Unit.Services
                 CompanyId = "12345"
             };
 
-            _mockFactory.Setup(f => f.GetStrategy(CountryCode.Unknown)).Returns((IVatRegistrationStrategy) new UnsupportedCountryException(CountryCode.Unknown));
+            _mockFactory.Setup(f => f.GetStrategy(CountryCode.Unknown)).Throws(new UnsupportedCountryException(CountryCode.Unknown));
 
             // Act & Assert
             var exception = await Assert.ThrowsAsync<UnsupportedCountryException>(() => _service.RegisterVatAsync(request));
-            Assert.Equal("No VAT registration strategy found for the country: Unknown", exception.Message);
+            Assert.Equal($"VAT registration is not supported for country: {CountryCode.Unknown}", exception.Message);
         }
     }
-
 }
